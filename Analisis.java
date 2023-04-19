@@ -1,6 +1,7 @@
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class Analisis {
 
     String sCodigoFuente = "";
@@ -16,7 +17,7 @@ public class Analisis {
 
     public void Generar() {
 
-        // Establecemos una cadena de coincidencias Esto es una exprecion regular
+        // Establecemos una cadena de coincidencias Esto es una expresion regular
         String coincidencias = "(class|for|if|float|int|boolean|static|new|static|void|int|string|import|public|else|programa|binario|"
                 + "octal|hexadecimal|leer|escribir|finprograma)|"
                 + "([a-zA-Z]+)|"
@@ -33,6 +34,8 @@ public class Analisis {
                 + "([0-1]b)|"
                 + "([0-8]o)|"
                 + "(^[0-9A-F]+$)|"
+                + "(\\s+)|"
+                + "(//.*)|(/\\*.*?\\*/)|"
                 + "(^(\s)*)";
 
         // Define un patron de busquedas dentro de nuestra cadena de coincidencias
@@ -58,9 +61,10 @@ public class Analisis {
             String tokenOctales = mMatcher.group(13);
             String tokenHexadecimales = mMatcher.group(14);
             String tokenEspacios = mMatcher.group(15);
+            String tokenComentarioUnaLinea = mMatcher.group(16);
 
             int nPosInicioLexema = 0;
-            nLinea = ObtenerLina(sCodigoFuente, mMatcher.start());
+            nLinea = ObtenerLinea(sCodigoFuente, mMatcher.start());
 
             if (tokenPalabrasrReservadas != null) {
                 nPosLectura += tokenPalabrasrReservadas.length();
@@ -148,13 +152,16 @@ public class Analisis {
                 nPosInicioLexema = nPosLectura - tokenHexadecimales.length();
                 AgregarSimbolo("Numeros hexadecimales", tokenHexadecimales, nLinea, nPosInicioLexema, nPosLectura);
             }
-
             if (tokenEspacios != null) {
+                nPosLectura += tokenEspacios.length();
+                nPosInicioLexema = nPosLectura - tokenEspacios.length();
+                //AgregarSimbolo("Espacio en blanco:", tokenEspacios, nLinea, nPosInicioLexema, nPosLectura);
 
-                // System.out.println(tokenEspacios);
-                // if (tokenEspacios.length() > 1)
-                // nPosLectura -= tokenEspacios.length();
-
+            }
+            if(tokenComentarioUnaLinea != null){
+                nPosLectura += tokenComentarioUnaLinea.length();
+                AgregarSimbolo("Comentario de una línea:", tokenComentarioUnaLinea, nLinea, nPosLectura - tokenComentarioUnaLinea.length(), nPosLectura);
+           
             }
 
         }
@@ -182,7 +189,7 @@ public class Analisis {
 
     }
 
-    int ObtenerLina(String sCodigoFuente, int nInicio) {
+    int ObtenerLinea(String sCodigoFuente, int nInicio) {
         int nLinea = 1;
         Pattern pPatron = Pattern.compile("\n");
         Matcher mMatcher = pPatron.matcher(sCodigoFuente);
