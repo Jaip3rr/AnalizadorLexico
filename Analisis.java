@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 public class Analisis {
 
     String sCodigoFuente = "";
+    String sCodigoFuenteErrores = "";
     TblaTokens[] TaToken = new TblaTokens[0];
     TblaSimbolos[] TaSimbolos = new TblaSimbolos[0];
     TblaReservadas[] TaReserv = new TblaReservadas[0];
@@ -20,6 +21,7 @@ public class Analisis {
 
     public Analisis(String sCodigoFuente) {
         this.sCodigoFuente = sCodigoFuente;
+        this.sCodigoFuenteErrores = sCodigoFuente;
         // System.out.println(sCodigoFuente);
     }
 
@@ -123,6 +125,54 @@ public class Analisis {
 }
 
         }
+
+                // Codigo fuente a chart para leer parte por parte
+                var cLetras = this.sCodigoFuenteErrores.toCharArray();
+                String sPalabra = "";
+                Pattern pPatronError = Pattern.compile(
+                        "(((\\(\\d{1,2},\\d{1,2}\\)){2,4})+-+\\([1-3]\\)+-+\\((25[0-5]|2[0-4]\\d|1\\d{1,2}|\\d{1,2}),(25[0-5]|2[0-4]\\d|1\\d{1,2}|\\d{1,2}),(25[0-5]|2[0-4]\\d|1\\d{1,2}|\\d{1,2})\\))");
+                this.nPosLectura = 0;
+                // Recorre palabra por palabra encontrada
+                for (int y = 0; y < cLetras.length; y++) {
+        
+                    nLinea = ObtenerLinea(sCodigoFuenteErrores, y);
+                    sPalabra += cLetras[y];
+                    this.nPosLectura++;
+        
+                    if (sPalabra.split("\\s").length > 0) {
+                        this.nPosLectura -= 1;
+                        sPalabra = sPalabra.trim();
+        
+                        char cLeta = cLetras[y];
+                        var x = ((cLeta + "").replace("", " ").trim());
+        
+                        // System.out.println(">" + sPalabra);
+        
+                        if (sPalabra.equals("Rectangulo")) {
+                            sPalabra = sPalabra.replaceAll("Rectangulo", "");
+                            nPosLectura += "Rectangulo".length();
+                        }
+        
+                        if (sPalabra.equals("Triangulo")) {
+                            sPalabra = sPalabra.replaceAll("Triangulo", "");
+                            nPosLectura += "Triangulo".length();
+                        }
+        
+                        if (sPalabra.equals("Cuadrado")) {
+                            sPalabra = sPalabra.replaceAll("Cuadrado", "");
+                            nPosLectura += "Cuadrado".length();
+                        }
+                        if (sPalabra.equals("Circulo")) {
+                            sPalabra = sPalabra.replaceAll("Circulo", "");
+                            nPosLectura += "Circulo".length();
+                        }
+                        if (sPalabra.equals("Linea")) {
+                            sPalabra = sPalabra.replaceAll("Linea", "");
+                            nPosLectura += "Linea".length();
+                        }
+                        // System.out.println(">" + nPosLectura);
+                    }
+                }
 
         oResultado.ImprimirTblaTokens(TaToken);
         oResultado.ImprimirTblaPlRes(TaReserv);
